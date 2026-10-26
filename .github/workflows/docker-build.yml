@@ -130,7 +130,7 @@ jobs:
                       org.opencontainers.image.version=v${{ steps.retrieve_versions.outputs.netbox_version }}
                       org.opencontainers.image.base.name=${{ steps.resolve_images.outputs.upstream }}
                       ${{ env.FINGERPRINT_LABEL }}=${{ steps.calculate_fingerprint.outputs.value }}
-                  platforms: linux/amd64,linux/arm64
+                  platforms: linux/amd64
                   push: true
                   tags: |
                       ${{ steps.resolve_images.outputs.image }}:latest
