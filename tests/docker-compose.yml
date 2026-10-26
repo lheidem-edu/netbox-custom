@@ -1,0 +1,45 @@
+services:
+    netbox:
+        image: netbox-custom:latest
+        depends_on:
+            netbox-postgresql:
+                condition: service_healthy
+            netbox-redis:
+                condition: service_healthy
+        environment:
+            DB_HOST: "netbox-postgresql"
+            DB_NAME: "netbox"
+            DB_USER: "netbox"
+            DB_PASSWORD: "IJhfDbIpIuM0aWLCCMw50kgDcrm5SjYYf0CbGf7epu36w0h5rP7jSxFIy2M6xThE"
+            REDIS_HOST: "netbox-redis"
+            REDIS_CACHE_HOST: "netbox-redis"
+            SECRET_KEY: "gU@))%jSq34CAM+WdBF_QleWU%lElBZp8e!&qLoc+PtQ)ey4e$$"
+            SKIP_SUPERUSER: "true"
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "curl -fsS http://localhost:8080/login/ >/dev/null || exit 1",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 60
+            start_period: 60s
+
+    netbox-postgresql:
+        image: postgres:18-alpine
+        environment:
+            POSTGRES_DB: "netbox"
+            POSTGRES_USER: "netbox"
+            POSTGRES_PASSWORD: "IJhfDbIpIuM0aWLCCMw50kgDcrm5SjYYf0CbGf7epu36w0h5rP7jSxFIy2M6xThE"
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U netbox -d netbox"]
+            interval: 5s
+            retries: 20
+
+    netbox-redis:
+        image: valkey/valkey:8-alpine
+        healthcheck:
+            test: ["CMD", "valkey-cli", "ping"]
+            interval: 5s
+            retries: 20
